@@ -1,0 +1,6 @@
+@SecureIssueTrackerApi_07_HostAddress = http://localhost:5185
+
+GET {{SecureIssueTrackerApi_07_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
