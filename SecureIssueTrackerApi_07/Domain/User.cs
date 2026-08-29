@@ -27,6 +27,14 @@ namespace SecureIssueTrackerApi_07.Domain
             IsActive = true;
             CreatedAt = DateTime.UtcNow;
         }
+        public void Update(string fullName, string email, string passwordHash, UserRole role)
+        {
+            Validate(fullName, email, passwordHash, role);
+            FullName = fullName;
+            Email = email;
+            PasswordHash = passwordHash;
+            Role = role;
+        }
         public void Activate()
         {
             IsActive = true;
