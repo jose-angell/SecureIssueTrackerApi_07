@@ -12,7 +12,8 @@ namespace SecureIssueTrackerApi_07.Domain
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
-        public ICollection<Ticket> Tickets { get; } = new List<Ticket>();
+        public ICollection<Ticket> CreatedTickets { get; } = new List<Ticket>();
+        public ICollection<Ticket> AssignedTickets { get; } = new List<Ticket>();
         private User() { }
 
         public User(string fullName, string email, string passwordHash, UserRole role)
@@ -24,7 +25,7 @@ namespace SecureIssueTrackerApi_07.Domain
             PasswordHash = passwordHash;
             Role = role;
             IsActive = true;
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
         }
         public void Activate()
         {
