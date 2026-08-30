@@ -1,5 +1,4 @@
 ﻿using SecureIssueTrackerApi_07.Exceptions;
-using System.Data;
 
 namespace SecureIssueTrackerApi_07.Domain
 {
@@ -17,7 +16,7 @@ namespace SecureIssueTrackerApi_07.Domain
         public DateTime? ClosedAt { get; private set; }
 
         public User CreatedByUser { get; private set; } = null!;
-        public User? AssignedToUser { get; private set; } 
+        public User? AssignedToUser { get; private set; }
 
         private Ticket() { }
 

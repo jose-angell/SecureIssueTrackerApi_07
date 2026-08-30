@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SecureIssueTrackerApi_07.Dtos.Ticket
 {
-    public class CreateTicket
+    public class CreateTicketRequest
     {
         [Required(ErrorMessage = "El titulo del Ticket es obligatorio.")]
         [MaxLength(150, ErrorMessage = "El titulo debe tener como maximo 150 caractires.")]
