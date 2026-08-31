@@ -55,7 +55,7 @@ namespace SecureIssueTrackerApi_07.Application
             ticket.Open();
             await _context.SaveChangesAsync();
         }
-        public async Task InProgress(Guid id)
+        public async Task StartProgress(Guid id)
         {
             var ticket = await _context.Tickets.FindAsync(id);
             if (ticket == null) throw new NotFoundException("El ticket no esta en el sistema.");
