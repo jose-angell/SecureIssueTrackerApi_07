@@ -13,7 +13,7 @@ namespace SecureIssueTrackerApi_07.Application
         {
             _context = context;
         }
-        public async Task<CustomerDto> Create(CreateCustomerRequest request)
+        public async Task<AuthResponse> Create(RegisterCustomerRequest request)
         {
             var existEmail = await _context.Users.AnyAsync(u => u.Email == request.Email);
             if (existEmail) throw new ConflictException("El correo no esta disponible.");
@@ -26,14 +26,13 @@ namespace SecureIssueTrackerApi_07.Application
             var newUser = new User(request.FullName!, request.Email!, passwordHash, role);
             await _context.Users.AddAsync(newUser);
             await _context.SaveChangesAsync();
-            return new CustomerDto
+            return new AuthResponse
             {
-                Id = newUser.Id,
+                AccessToken = "sample_access_token", // This should be generated properly
+                UserId = newUser.Id,
                 FullName = newUser.FullName,
                 Email = newUser.Email,
                 Role = newUser.Role,
-                IsActive = newUser.IsActive,
-                CreatedAt = newUser.CreatedAt,
             };
         }
     }

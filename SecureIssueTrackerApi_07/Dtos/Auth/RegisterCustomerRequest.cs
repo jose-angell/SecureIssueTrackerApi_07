@@ -2,7 +2,7 @@
 
 namespace SecureIssueTrackerApi_07.Dtos.Auth
 {
-    public class CreateCustomerRequest
+    public class RegisterCustomerRequest
     {
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [StringLength(300, ErrorMessage = "El nombre no puede tener mas de 300 caracteres")]
