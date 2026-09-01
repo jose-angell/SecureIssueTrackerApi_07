@@ -9,8 +9,8 @@ namespace SecureIssueTrackerApi_07.Controllers
     [Route("api/tickets")]
     public class TicketController : ControllerBase
     {
-        private readonly TicketUserCase _useCase;
-        public TicketController(TicketUserCase useCase)
+        private readonly TicketUseCase _useCase;
+        public TicketController(TicketUseCase useCase)
         {
             _useCase = useCase;
         }

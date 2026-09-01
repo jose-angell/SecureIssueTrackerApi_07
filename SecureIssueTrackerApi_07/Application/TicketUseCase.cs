@@ -7,10 +7,10 @@ using System.Net.Sockets;
 
 namespace SecureIssueTrackerApi_07.Application
 {
-    public class TicketUserCase
+    public class TicketUseCase
     {
         private readonly AppDbContext _context;
-        public TicketUserCase(AppDbContext context)
+        public TicketUseCase(AppDbContext context)
         {
             _context = context;
         }
@@ -119,11 +119,11 @@ namespace SecureIssueTrackerApi_07.Application
                 .Include(u => u.CreatedByUser)
                 .Include(u => u.AssignedToUser);
 
-            if (String.IsNullOrWhiteSpace(paramsQuery.Title))
+            if (!String.IsNullOrWhiteSpace(paramsQuery.Title))
             {
                 query = query.Where(t => t.Title.ToLower().Contains(paramsQuery.Title!));
             }
-            if (String.IsNullOrWhiteSpace(paramsQuery.Description))
+            if (!String.IsNullOrWhiteSpace(paramsQuery.Description))
             {
                 query = query.Where(t => t.Description.ToLower().Contains(paramsQuery.Description!));
             }
