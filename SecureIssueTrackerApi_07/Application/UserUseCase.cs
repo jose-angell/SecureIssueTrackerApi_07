@@ -18,7 +18,10 @@ namespace SecureIssueTrackerApi_07.Application
             var existEmail = await _context.Users.AnyAsync(u => u.Email == request.Email);
             if (existEmail) throw new ConflictException("El correo no esta disponible.");
 
-            var newUser = new User(request.FullName!, request.Email!, request.PasswordHash!, request.Role!.Value);
+            // crear password hash
+             var passwordHash = request.Password!;
+
+            var newUser = new User(request.FullName!, request.Email!, passwordHash, request.Role!.Value);
             await _context.Users.AddAsync(newUser);
             await _context.SaveChangesAsync();
             return new UserDto
@@ -39,7 +42,10 @@ namespace SecureIssueTrackerApi_07.Application
             var existEmail = await _context.Users.AnyAsync(u => u.Id != id && u.Email == request.Email);
             if (existEmail) throw new ConflictException("El correo no esta disponible.");
 
-            user.Update(request.FullName!, request.Email!, request.PasswordHash!, request.Role!.Value);
+            // crear password hash
+            var passwordHash = request.Password!;
+
+            user.Update(request.FullName!, request.Email!, passwordHash, request.Role!.Value);
             await _context.SaveChangesAsync();
         }
         public async Task Delete(Guid id)

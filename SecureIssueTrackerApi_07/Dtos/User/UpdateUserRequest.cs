@@ -15,7 +15,7 @@ namespace SecureIssueTrackerApi_07.Dtos.User
         public string? Email { get; set; }
 
         [Required(ErrorMessage = "La contraseña es obligatorio.")]
-        public string? PasswordHash { get; set; }
+        public string? Password { get; set; }
 
         [Required(ErrorMessage = "El Role es obligatorio.")]
         public UserRole? Role { get; set; }
