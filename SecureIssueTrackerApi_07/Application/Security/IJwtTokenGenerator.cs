@@ -4,6 +4,6 @@ namespace SecureIssueTrackerApi_07.Application.Security
 {
     public interface IJwtTokenGenerator
     {
-        public string GenerateToken(User user);
+        string Generate(User user);
     }
 }
