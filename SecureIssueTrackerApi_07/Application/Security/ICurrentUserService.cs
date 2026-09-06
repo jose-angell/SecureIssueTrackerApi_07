@@ -1,6 +1,6 @@
 ﻿using SecureIssueTrackerApi_07.Domain;
 
-namespace SecureIssueTrackerApi_07.Infrastructure.Security
+namespace SecureIssueTrackerApi_07.Application.Security
 {
     public interface ICurrentUserService
     {
