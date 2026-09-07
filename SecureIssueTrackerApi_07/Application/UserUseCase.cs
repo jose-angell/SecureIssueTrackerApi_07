@@ -1,17 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SecureIssueTrackerApi_07.Application.Security;
+using SecureIssueTrackerApi_07.Domain;
 using SecureIssueTrackerApi_07.Dtos.User;
 using SecureIssueTrackerApi_07.Exceptions;
 using SecureIssueTrackerApi_07.Infrastructure;
-using SecureIssueTrackerApi_07.Domain;
 
 namespace SecureIssueTrackerApi_07.Application
 {
     public class UserUseCase
     {
         private readonly AppDbContext _context;
-        public UserUseCase(AppDbContext context)
+        private readonly IPasswordHashService _passwordHashService;
+        public UserUseCase(AppDbContext context, IPasswordHashService passwordHashService)
         {
             _context = context;
+            _passwordHashService = passwordHashService;
         }
         public async Task<UserDto> Create( CreateUserRequest request)
         {
@@ -19,7 +22,7 @@ namespace SecureIssueTrackerApi_07.Application
             if (existEmail) throw new ConflictException("El correo no esta disponible.");
 
             // crear password hash
-             var passwordHash = request.Password!;
+             var passwordHash = _passwordHashService.Hash(request.Password!);
 
             var newUser = new User(request.FullName!, request.Email!, passwordHash, request.Role!.Value);
             await _context.Users.AddAsync(newUser);

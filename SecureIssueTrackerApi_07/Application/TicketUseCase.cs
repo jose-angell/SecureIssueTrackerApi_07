@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SecureIssueTrackerApi_07.Application.Security;
 using SecureIssueTrackerApi_07.Domain;
 using SecureIssueTrackerApi_07.Dtos.Ticket;
 using SecureIssueTrackerApi_07.Exceptions;
@@ -10,15 +11,22 @@ namespace SecureIssueTrackerApi_07.Application
     public class TicketUseCase
     {
         private readonly AppDbContext _context;
-        public TicketUseCase(AppDbContext context)
+        private readonly ICurrentUserService _currentUserService;
+        public TicketUseCase(AppDbContext context, ICurrentUserService currentUserService)
         {
             _context = context;
+            _currentUserService = currentUserService;
         }
         public async Task<TicketDto> Create(CreateTicketRequest request)
         {
-            //TODO: agregar la funcion para tommar el id de la persona desde HTTContext
-            var userId = Guid.NewGuid();
-            var newTicket = new Ticket(request.Title!, request.Description!, request.Priority!.Value, userId);
+            var currentUserId = _currentUserService.UserId;
+            var user = await _context.Users.FindAsync(currentUserId);
+
+            if (user is null) throw new NotFoundException("Usuario no encontrado.");
+
+            if (!user.IsActive) throw new ForbiddenException("El usuario está inactivo.");
+
+            var newTicket = new Ticket(request.Title!, request.Description!, request.Priority!.Value, currentUserId);
             await _context.Tickets.AddAsync(newTicket);
             await _context.SaveChangesAsync();
             return new TicketDto
