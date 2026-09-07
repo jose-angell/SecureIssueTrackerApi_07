@@ -33,6 +33,7 @@ namespace SecureIssueTrackerApi_07
             var (statusCode, title, detail) = exception switch
             {
                 UnauthorizedException ex => (StatusCodes.Status401Unauthorized, "No autorizado", ex.Message),
+                ForbiddenException ex => (StatusCodes.Status403Forbidden, "Acceso denegado", ex.Message),
                 NotFoundException ex => (StatusCodes.Status404NotFound, "Recurso no encontrado", ex.Message),
                 ConflictException ex => (StatusCodes.Status409Conflict, "Conflicto en el recurso", ex.Message),
                 DomainException ex => (StatusCodes.Status400BadRequest, "Error de validación", ex.Message),
