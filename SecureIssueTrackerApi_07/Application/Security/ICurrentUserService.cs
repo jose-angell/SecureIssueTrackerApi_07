@@ -4,7 +4,9 @@ namespace SecureIssueTrackerApi_07.Application.Security
 {
     public interface ICurrentUserService
     {
-        public Guid GetCurrentUser();
-        public UserRole GetCurrentUserRole();
+        bool IsAuthenticated { get; }
+        Guid UserId { get; }
+        string? Email { get; }
+        UserRole Role { get; }
     }
 }
