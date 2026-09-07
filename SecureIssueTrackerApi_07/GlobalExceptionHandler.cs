@@ -32,6 +32,7 @@ namespace SecureIssueTrackerApi_07
             // 1. Mapeo ordenado de específico a general
             var (statusCode, title, detail) = exception switch
             {
+                UnauthorizedException ex => (StatusCodes.Status401Unauthorized, "No autorizado", ex.Message),
                 NotFoundException ex => (StatusCodes.Status404NotFound, "Recurso no encontrado", ex.Message),
                 ConflictException ex => (StatusCodes.Status409Conflict, "Conflicto en el recurso", ex.Message),
                 DomainException ex => (StatusCodes.Status400BadRequest, "Error de validación", ex.Message),
