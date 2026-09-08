@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using SecureIssueTrackerApi_07.Application;
 using SecureIssueTrackerApi_07.Dtos.Auth;
@@ -7,6 +8,7 @@ namespace SecureIssueTrackerApi_07.Controllers
 {
     [ApiController]
     [Route("api/auth")]
+    [AllowAnonymous]
     public class AuthController : ControllerBase
     {
         private readonly AuthUseCase _useCase;
@@ -14,8 +16,8 @@ namespace SecureIssueTrackerApi_07.Controllers
         {
             _useCase = useCase;
         }
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] RegisterCustomerRequest request)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterCustomerRequest request)
         {
             var response = await _useCase.Create(request);
             return Ok(response);

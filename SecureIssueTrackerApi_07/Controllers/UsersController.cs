@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SecureIssueTrackerApi_07.Application;
 using SecureIssueTrackerApi_07.Dtos.User;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SecureIssueTrackerApi_07.Controllers
 {
     [ApiController]
     [Route("api/users")]
+    [Authorize(Roles = "Admin")]
     public class UsersController : ControllerBase
     {
         private readonly UserUseCase _useCase;

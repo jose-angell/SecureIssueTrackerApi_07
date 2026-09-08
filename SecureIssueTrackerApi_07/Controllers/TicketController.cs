@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SecureIssueTrackerApi_07.Application;
 using SecureIssueTrackerApi_07.Dtos.Ticket;
 using System.Formats.Asn1;
@@ -7,6 +8,7 @@ namespace SecureIssueTrackerApi_07.Controllers
 {
     [ApiController]
     [Route("api/tickets")]
+    [Authorize]
     public class TicketController : ControllerBase
     {
         private readonly TicketUseCase _useCase;
@@ -28,6 +30,7 @@ namespace SecureIssueTrackerApi_07.Controllers
             return Ok(result);
         }
         [HttpPost]
+        [Authorize(Roles = "Customer,Agent,Admin")]
         public async Task<IActionResult> Create([FromBody] CreateTicketRequest request)
         {
             var result = await _useCase.Create(request);
@@ -42,6 +45,7 @@ namespace SecureIssueTrackerApi_07.Controllers
             return NoContent();
         }
         [HttpPatch("{id:guid}/assign")]
+        [Authorize(Roles = "Agent,Admin")]
         public async Task<IActionResult> AssignTo([FromRoute] Guid id, [FromBody] Guid userId)
         {
             if (id == Guid.Empty) return BadRequest("El id es invalido");
@@ -50,6 +54,7 @@ namespace SecureIssueTrackerApi_07.Controllers
             return NoContent();
         }
         [HttpPatch("{id:guid}/start-progress")]
+        [Authorize(Roles = "Agent,Admin")]
         public async Task<IActionResult> StartProgress([FromRoute] Guid id)
         {
             if (id == Guid.Empty) return BadRequest("El id es invalido");
@@ -57,6 +62,7 @@ namespace SecureIssueTrackerApi_07.Controllers
             return NoContent();
         }
         [HttpPatch("{id:guid}/resolve")]
+        [Authorize(Roles = "Agent,Admin")]
         public async Task<IActionResult> Resolve([FromRoute] Guid id)
         {
             if (id == Guid.Empty) return BadRequest("El id es invalido");
@@ -64,6 +70,7 @@ namespace SecureIssueTrackerApi_07.Controllers
             return NoContent();
         }
         [HttpPatch("{id:guid}/close")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Close([FromRoute] Guid id)
         {
             if (id == Guid.Empty) return BadRequest("El id es invalido");
