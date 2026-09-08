@@ -42,7 +42,7 @@ namespace SecureIssueTrackerApi_07.Application
                 Role = newUser.Role
             };
         }
-        public async Task<AuthResponse> Login(LoginRequest request)
+        public async Task<AuthResponse> Login(LoginCustomerRequest request)
         {
             var user = await _context.Users
                 .FirstOrDefaultAsync(user => user.Email == request.Email);

@@ -2,7 +2,7 @@
 
 namespace SecureIssueTrackerApi_07.Dtos.Auth
 {
-    public class LoginRequest
+    public class LoginCustomerRequest
     {
         [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
         [StringLength(200, ErrorMessage = "El correo no puede tener mas de 200 caracteres")]
