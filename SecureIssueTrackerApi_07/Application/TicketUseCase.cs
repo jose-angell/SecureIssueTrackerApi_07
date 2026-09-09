@@ -65,6 +65,10 @@ namespace SecureIssueTrackerApi_07.Application
         }
         public async Task StartProgress(Guid id)
         {
+            var currentRole = _currentUserService.Role;
+            if(currentRole == UserRole.Customer)
+                throw new ForbiddenException("Un cliente no puede iniciar el progreso de un ticket.");
+
             var ticket = await _context.Tickets.FindAsync(id);
             if (ticket == null) throw new NotFoundException("El ticket no esta en el sistema.");
 
@@ -92,11 +96,46 @@ namespace SecureIssueTrackerApi_07.Application
             var ticket = await _context.Tickets.FindAsync(id);
             if (ticket == null) throw new NotFoundException("El ticket no esta en el sistema.");
 
-            var existUser = await _context.Users.AnyAsync(u => u.Id == userId);
-            if (!existUser) throw new NotFoundException("El usuario no esta en el sistema.");
+            var targetUser = await _context.Users.FindAsync(userId);
+            if (targetUser is null)
+                throw new NotFoundException("El usuario no está en el sistema.");
+
+            if (!targetUser.IsActive)
+                throw new ConflictException("No se puede asignar un ticket a un usuario inactivo.");
+
+            if (targetUser.Role != UserRole.Agent)
+                throw new ConflictException("El ticket solo puede asignarse a un agente.");
+
+            var currentUserId = _currentUserService.UserId;
+            var currentRole = _currentUserService.Role;
+
+            if (currentRole == UserRole.Agent && userId != currentUserId)
+                throw new ForbiddenException("Un agente solo puede asignarse tickets a sí mismo.");
+
+            if (currentRole != UserRole.Agent && currentRole != UserRole.Admin)
+                throw new ForbiddenException("No tienes permiso para asignar tickets.");
 
             ticket.AssignTo(userId);
             await _context.SaveChangesAsync();
+        }
+        private void EnsureCanViewTicket(Ticket ticket)
+        {
+            var currentUserId = _currentUserService.UserId;
+            var currentRole = _currentUserService.Role;
+
+            if (currentRole == UserRole.Admin)
+                return;
+
+            if (currentRole == UserRole.Customer &&
+                ticket.CreatedByUserId == currentUserId)
+                return;
+
+            if (currentRole == UserRole.Agent &&
+                (ticket.Status == TicketStatus.Open ||
+                 ticket.AssignedToUserId == currentUserId))
+                return;
+
+            throw new ForbiddenException("No tienes permiso para ver este ticket.");
         }
         public async Task<TicketDto> GetById(Guid id)
         {
@@ -104,7 +143,11 @@ namespace SecureIssueTrackerApi_07.Application
                 .Include(u => u.CreatedByUser)
                 .Include(u => u.AssignedToUser)
                 .FirstOrDefaultAsync(u => u.Id == id);
+
             if (ticket == null) throw new NotFoundException("El ticket no esta en el sistema.");
+
+            EnsureCanViewTicket(ticket);
+
             return new TicketDto
             {
                 Id = ticket.Id,
@@ -123,9 +166,23 @@ namespace SecureIssueTrackerApi_07.Application
         }
         public async Task<IEnumerable<TicketDto>> GetAll(TicketQuery paramsQuery)
         {
+            var currentUserId = _currentUserService.UserId;
+            var currentRole = _currentUserService.Role;
+
             IQueryable<Ticket> query = _context.Tickets.AsNoTracking()
                 .Include(u => u.CreatedByUser)
                 .Include(u => u.AssignedToUser);
+
+            if (currentRole == UserRole.Customer)
+            {
+                query = query.Where(t => t.CreatedByUserId == currentUserId);
+            }
+            else if (currentRole == UserRole.Agent)
+            {
+                query = query.Where(t =>
+                    t.Status == TicketStatus.Open ||
+                    t.AssignedToUserId == currentUserId);
+            }
 
             if (!String.IsNullOrWhiteSpace(paramsQuery.Title))
             {
