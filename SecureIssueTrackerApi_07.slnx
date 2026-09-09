@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="SecureIssueTrackerApi_07.Tests/SecureIssueTrackerApi_07.Tests.csproj" Id="98556eaa-52e3-4ce0-8a7f-d80ef2deb582" />
   <Project Path="SecureIssueTrackerApi_07/SecureIssueTrackerApi_07.csproj" />
 </Solution>
