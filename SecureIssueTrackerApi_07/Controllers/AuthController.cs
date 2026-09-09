@@ -19,7 +19,7 @@ namespace SecureIssueTrackerApi_07.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterCustomerRequest request)
         {
-            var response = await _useCase.Create(request);
+            var response = await _useCase.RegisterCustomer(request);
             return Ok(response);
         }
         [HttpPost("login")]

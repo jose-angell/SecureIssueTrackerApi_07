@@ -18,7 +18,7 @@ namespace SecureIssueTrackerApi_07.Application
             _passwordHashService = passwordHashService;
             _jwtTokenGenerator = jwtTokenGenerator;
         }
-        public async Task<AuthResponse> Create(RegisterCustomerRequest request)
+        public async Task<AuthResponse> RegisterCustomer(RegisterCustomerRequest request)
         {
             var existEmail = await _context.Users.AnyAsync(u => u.Email == request.Email);
             if (existEmail) throw new ConflictException("El correo no esta disponible.");
