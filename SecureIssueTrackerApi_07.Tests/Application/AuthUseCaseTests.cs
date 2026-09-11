@@ -1,4 +1,5 @@
-﻿using SecureIssueTrackerApi_07.Application;
+﻿using Microsoft.AspNetCore.Identity.Data;
+using SecureIssueTrackerApi_07.Application;
 using SecureIssueTrackerApi_07.Application.Security;
 using SecureIssueTrackerApi_07.Domain;
 using SecureIssueTrackerApi_07.Dtos.Auth;
@@ -87,24 +88,138 @@ namespace SecureIssueTrackerApi_07.Tests.Application
             // Assert
             await Assert.ThrowsAsync<ConflictException>(act);
         }
-    }
-    public sealed class FakePasswordHashService : IPasswordHashService
-    {
-        public string Hash(string password)
+        [Fact]
+        public async Task Login_ShouldReturnToken_WhenCredentialsAreValid()
         {
-            return $"HASHED:{password}";
-        }
+            // Arrange
+            using var db = new TestDbContextFactory();
+            var context = db.Context;
 
-        public bool Verify(string password, string passwordHash)
-        {
-            return passwordHash == $"HASHED:{password}";
+            var passwordHashService = new FakePasswordHashService();
+            var jwtTokenGenerator = new FakeJwtTokenGenerator();
+
+            var user = new User(
+                "José Gallardo",
+                "jose@test.com",
+                passwordHashService.Hash("123456"),
+                UserRole.Customer);
+
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            var useCase = new AuthUseCase(
+                context,
+                passwordHashService,
+                jwtTokenGenerator);
+
+            var request = new LoginCustomerRequest
+            {
+                Email = "jose@test.com",
+                Password = "123456"
+            };
+
+            // Act
+            var result = await useCase.Login(request);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(user.Id, result.UserId);
+            Assert.Equal(user.Email, result.Email);
+            Assert.Equal(user.Role, result.Role);
+            Assert.Equal($"fake-token-for-{user.Id}", result.AccessToken);
         }
-    }
-    public sealed class FakeJwtTokenGenerator : IJwtTokenGenerator
-    {
-        public string Generate(User user)
+        [Fact]
+        public async Task Login_ShouldThrowUnauthorizedException_WhenPasswordIsInvalid()
         {
-            return $"fake-token-for-{user.Id}";
+            // Arrange
+            using var db = new TestDbContextFactory();
+            var context = db.Context;
+
+            var passwordHashService = new FakePasswordHashService();
+            var jwtTokenGenerator = new FakeJwtTokenGenerator();
+
+            var user = new User(
+                "José Gallardo",
+                "jose@test.com",
+                passwordHashService.Hash("123456"),
+                UserRole.Customer);
+
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            var useCase = new AuthUseCase(
+                context,
+                passwordHashService,
+                jwtTokenGenerator);
+
+            var request = new LoginCustomerRequest
+            {
+                Email = "jose@test.com",
+                Password = "wrong-password"
+            };
+
+            // Act
+            Func<Task> act = () => useCase.Login(request);
+
+            // Assert
+            await Assert.ThrowsAsync<UnauthorizedException>(act);
+        }
+        [Fact]
+        public async Task Login_ShouldThrowForbiddenException_WhenUserIsInactive()
+        {
+            // Arrange
+            using var db = new TestDbContextFactory();
+            var context = db.Context;
+
+            var passwordHashService = new FakePasswordHashService();
+            var jwtTokenGenerator = new FakeJwtTokenGenerator();
+
+            var user = new User(
+                "José Gallardo",
+                "jose@test.com",
+                passwordHashService.Hash("123456"),
+                UserRole.Customer);
+
+            user.Deactivate();
+
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            var useCase = new AuthUseCase(
+                context,
+                passwordHashService,
+                jwtTokenGenerator);
+
+            var request = new LoginCustomerRequest
+            {
+                Email = "jose@test.com",
+                Password = "123456"
+            };
+
+            // Act
+            Func<Task> act = () => useCase.Login(request);
+
+            // Assert
+            await Assert.ThrowsAsync<ForbiddenException>(act);
+        }
+        private sealed class FakePasswordHashService : IPasswordHashService
+        {
+            public string Hash(string password)
+            {
+                return $"HASHED:{password}";
+            }
+
+            public bool Verify(string password, string passwordHash)
+            {
+                return passwordHash == $"HASHED:{password}";
+            }
+        }
+        private sealed class FakeJwtTokenGenerator : IJwtTokenGenerator
+        {
+            public string Generate(User user)
+            {
+                return $"fake-token-for-{user.Id}";
+            }
         }
     }
 }
