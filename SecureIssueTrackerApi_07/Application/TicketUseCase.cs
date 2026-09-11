@@ -37,6 +37,7 @@ namespace SecureIssueTrackerApi_07.Application
                 Status = newTicket.Status,
                 Priority = newTicket.Priority,
                 CreatedAt = newTicket.CreatedAt,
+                CreatedByUserId = newTicket.CreatedByUserId,
             };
         }
         public async Task UpdateDescription(Guid id, string description)
