@@ -181,7 +181,7 @@ namespace SecureIssueTrackerApi_07.Application
             else if (currentRole == UserRole.Agent)
             {
                 query = query.Where(t =>
-                    t.Status == TicketStatus.Open ||
+                    //t.Status == TicketStatus.Open ||
                     t.AssignedToUserId == currentUserId);
             }
 
